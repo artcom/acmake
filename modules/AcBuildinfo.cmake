@@ -24,11 +24,14 @@ option(ACMAKE_BUILDINFO
         "Generate build timestamps and compiler information?" YES)
 if(ACMAKE_BUILDINFO)
     if(NOT ACMAKE_BUILDINFO_TEMPLATE)
-        message("ACMake currently does not have a default buildinfo template.")
-        set(ACMAKE_BUILDINFO OFF)
+        set( ACMAKE_BUILDINFO_TEMPLATE ${ACMAKE_TEMPLATES_DIR}/buildinfo.cpp.in
+             CACHE FILEPATH "Buildinfo input template")
+        message(STATUS "using default buildinfo template.")
+        if(NOT ACMAKE_BUILDINFO_TEMPLATE)
+            message("ACMake currently does not have a default buildinfo template.")
+            set(ACMAKE_BUILDINFO OFF)
+        endif(NOT ACMAKE_BUILDINFO_TEMPLATE)
     endif(NOT ACMAKE_BUILDINFO_TEMPLATE)
-    #set( ACMAKE_BUILDINFO_TEMPLATE ${ACMAKE_TEMPLATES_DIR}/buildinfo.cpp.in
-    #        CACHE FILEPATH "Buildinfo input template")
     option(ACMAKE_BUILDINFO_SCMDATA
             "Include SCM related data into the build (only svn)?" YES)
     set(ACMAKE_BUILDINFO_FILE_SUFFIX "_buildinfo.cpp")
