@@ -77,6 +77,7 @@ macro(_ac_init_installer_shortcuts)
         install(
             FILES ${ACMAKE_SHORTCUT_FILE}
             DESTINATION lib/acmake/tools
+            COMPONENT AcMake
         )
         # if we are building a package without acmake integrated,
         # install the shortcut creation and removal scripts into
@@ -88,6 +89,7 @@ macro(_ac_init_installer_shortcuts)
                     ${ACMAKE_TOOLS_DIR}/CreateShortcuts.wsf
                     ${ACMAKE_TOOLS_DIR}/RemoveShortcuts.wsf
                 DESTINATION lib/acmake/tools
+                COMPONENT AcMake
             )
         endif(NOT ACMAKE_IS_INTEGRATED)
     endif(WIN32)
@@ -142,7 +144,7 @@ macro(_ac_declare_installer NAME)
     # parse arguments
     parse_arguments(
         INSTALLER
-        "CONTACT;VENDOR;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;DESCRIPTION;DESCRIPTION_FILE;LICENSE_FILE;PACKAGE_ICON;INSTALLER_ICON;UNINSTALLER_ICON"
+        "CONTACT;VENDOR;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;DESCRIPTION;DESCRIPTION_FILE;LICENSE_FILE;PACKAGE_ICON;INSTALLER_ICON;UNINSTALLER_ICON;CREATE_SHORTCUTS"
         ""
         ${ARGN}
     )
@@ -186,8 +188,17 @@ macro(_ac_declare_installer NAME)
         endif(LINUX)
 
         if(WIN32)
-            _ac_init_installer_shortcuts()
-        
+            if(INSTALLER_CREATE_SHORTCUTS)
+                _ac_init_installer_shortcuts()
+                set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+                    ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\CreateShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
+                    ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+                ")
+#             set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+#                 ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\RemoveShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
+#             ")
+            endif(INSTALLER_CREATE_SHORTCUTS)
+            
             # XXX: configurable?
             set(CPACK_NSIS_MODIFY_PATH ON)
 
@@ -207,14 +218,7 @@ macro(_ac_declare_installer NAME)
                 set(CPACK_NSIS_MUI_UNIICON ${UNINSTALLER_ICON_NSIS})
             endif(INSTALLER_UNINSTALLER_ICON)
             
-            set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\CreateShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
-${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-            ")
-#             set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
-#                 ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\RemoveShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
-#             ")
-
+            
         endif(WIN32)
 
         ac_debug_installer("CPack is being initialized")
