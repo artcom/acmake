@@ -45,6 +45,7 @@ install(
     DESTINATION ${ACMAKE_TEMPLATES_SUB}
     FILES_MATCHING
         PATTERN "*.in"
+        PATTERN "*.cpp"
         PATTERN ".svn" EXCLUDE
 )
 
@@ -60,6 +61,7 @@ install(
     DESTINATION ${ACMAKE_TOOLS_SUB}
     FILES_MATCHING
         PATTERN "*.jar"
+        PATTERN "*.cmake"
         ${EXTRA_TOOLS}
 	PATTERN ".svn" EXCLUDE
 )
