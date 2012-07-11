@@ -104,6 +104,7 @@
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
+            <macro-ref macro="${run_nmake_install}"/>
         </recipe>
 
         <recipe name="NMake Nightly">
@@ -113,7 +114,7 @@
             <property name="cmake.recipe.args" value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
             <macro-ref macro="${run_cmake}"/>
-            <macro-ref macro="${run_nmake_build}"/>
+            <macro-ref macro="${run_nmake_install}"/>
         </recipe>
     </scope>
 
