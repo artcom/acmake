@@ -53,7 +53,7 @@
             </executable>
     </macro>
     <macro name="run_nmake_install">
-        <executable exe="${vs.nmake.bin}" args="install" working-dir="${build.dir}" name="build">
+        <executable exe="${vs.nmake.bin}" args="install" working-dir="${build.dir}" name="install">
                 <process processor="${msbuild.pp}"/>
             </executable>
     </macro>
