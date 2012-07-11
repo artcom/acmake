@@ -66,6 +66,7 @@
 
         <recipe name="GMake Linux Continuous">
             <property name="cmake.generator" value="Unix Makefiles"/>
+            <property name="cmake.recipe.args" value="${cmake.recipe.args} -D CMAKE_INSTALL_PREFIX=${build.installprefix}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
@@ -74,6 +75,7 @@
 
         <recipe name="GMake Linux Nightly">
             <property name="cmake.generator" value="Unix Makefiles"/>
+            <property name="cmake.recipe.args" value="${cmake.recipe.args} -D CMAKE_INSTALL_PREFIX=${build.installprefix}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
@@ -82,6 +84,7 @@
 
         <recipe name="GMake OSX Continuous">
             <property name="cmake.generator" value="Unix Makefiles"/>
+            <property name="cmake.recipe.args" value="${cmake.recipe.args} -D CMAKE_INSTALL_PREFIX=${build.installprefix}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
@@ -90,6 +93,7 @@
 
         <recipe name="GMake OSX Nightly">
             <property name="cmake.generator" value="Unix Makefiles"/>
+            <property name="cmake.recipe.args" value="${cmake.recipe.args} -D CMAKE_INSTALL_PREFIX=${build.installprefix}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
