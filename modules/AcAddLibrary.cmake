@@ -198,6 +198,13 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                 COMPONENT ${COMPONENT_DEVELOPMENT}
         )
 
+        install(
+            FILES
+             ${CMAKE_BINARY_DIR}/include/${THIS_LIBRARY_PATH}/${THIS_LIBRARY_NAME}_paths.h
+            DESTINATION include/${THIS_LIBRARY_PATH}
+            COMPONENT ${COMPONENT_DEVELOPMENT}
+        )
+
         if(ACMAKE_DEBIAN)
             string(TOLOWER ${LIBRARY_NAME} LIBRARY_NAME_LOWER)
             set(PACKAGE_RUNTIME     lib${LIBRARY_NAME_LOWER}${THIS_LIBRARY_VERSION}-${THIS_LIBRARY_SOVERSION})
