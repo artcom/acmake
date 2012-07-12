@@ -100,5 +100,11 @@ function(ac_done_registering_build_types)
             "${CMAKE_BINARY_DIR}/include/acmake/build_configuration.h"
             "ac_create_build_config_header()"
     )
+    install(
+        FILES
+        "${CMAKE_BINARY_DIR}/include/acmake/build_configuration.h"
+        DESTINATION include/acmake
+        COMPONENT ${PROJECT_NAME}_development
+    )
 endfunction(ac_done_registering_build_types)
 
