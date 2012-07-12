@@ -76,7 +76,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     set(THIS_LIBRARY_PATHS_TEMPLATE ${ACMAKE_TEMPLATES_DIR}/AcPaths.h.in)
     ac_configure_file(
          ${THIS_LIBRARY_PATHS_TEMPLATE}
-         ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/acmake/${THIS_LIBRARY_NAME}_paths.h
+         ${CMAKE_BINARY_DIR}/include/${THIS_LIBRARY_PATH}/${THIS_LIBRARY_NAME}_paths.h
          "ac_add_library()"
     )
 
