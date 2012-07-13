@@ -95,4 +95,10 @@ ac_configure_file(
         ${CMAKE_BINARY_DIR}/include/acmake/module_name.h
         "${CMAKE_CURRENT_LIST_FILE}"
 )
+install(
+    FILES
+    ${CMAKE_BINARY_DIR}/include/acmake/module_name.h
+    DESTINATION include/acmake
+    COMPONENT ${PROJECT_NAME}_development
+)
 

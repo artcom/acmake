@@ -41,6 +41,7 @@ else(AcMake_SOURCE_DIR)
 
         # add modules in build dir
         list(INSERT CMAKE_MODULE_PATH 0 "${ACMAKE_PREFIX}/@ACMAKE_MODULES_SUB@")
+        message(STATUS "AcMake lies in build prefix ${ACMAKE_PREFIX}")
 
     else(EXISTS "${ACMAKE_PREFIX}/CMakeFiles")
         set(ACMAKE_TEMPLATES_DIR "${ACMAKE_PREFIX}/@ACMAKE_TEMPLATES_SUB@")
@@ -50,6 +51,7 @@ else(AcMake_SOURCE_DIR)
 
         # extend the module path to make AcMake loadable
         list(INSERT CMAKE_MODULE_PATH 0 ${ACMAKE_MODULES_DIR})
+        message(STATUS "AcMake lies in install prefix ${ACMAKE_PREFIX}")
 
     endif(EXISTS "${ACMAKE_PREFIX}/CMakeFiles")
 endif(AcMake_SOURCE_DIR)

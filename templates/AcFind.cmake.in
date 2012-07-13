@@ -71,11 +71,11 @@ else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
     # since imports can be used both from binary and install trees,
     # we have to find out in which one we are currently lying
     if(EXISTS "${@THIS_PROJECT_NAME@_PREFIX}/CMakeFiles")
-        message("@THIS_PROJECT_NAME@ lies in build prefix ${@THIS_PROJECT_NAME@_PREFIX}")
+        message(STATUS "@THIS_PROJECT_NAME@ lies in build prefix ${@THIS_PROJECT_NAME@_PREFIX}")
         set(@THIS_PROJECT_NAME@_IMPORTED_FROM_BUILD YES)
     else(EXISTS "${@THIS_PROJECT_NAME@_PREFIX}/CMakeFiles")
         # we are being used from an install tree
-        message("@THIS_PROJECT_NAME@ lies in install prefix ${@THIS_PROJECT_NAME@_PREFIX}")
+        message(STATUS "@THIS_PROJECT_NAME@ lies in install prefix ${@THIS_PROJECT_NAME@_PREFIX}")
         set(@THIS_PROJECT_NAME@_IMPORTED_FROM_INSTALL YES)
     endif(EXISTS "${@THIS_PROJECT_NAME@_PREFIX}/CMakeFiles")
 
