@@ -24,6 +24,30 @@ set(ACMAKE_INSTALLED_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_INCLUDE_SUB})
 # generate the config script
 configure_file(AcMakeConfig.cmake.in ${CMAKE_BINARY_DIR}/${ACMAKE_MODULES_SUB}/AcMakeConfig.cmake @ONLY)
 
+get_filename_component(ACMAKE_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+list(INSERT CMAKE_MODULE_PATH 0 ${ACMAKE_CMAKE_DIR}/modules)
+
+
+include(AcBoostUtils)
+include(AcVariableUtils)
+include(AcDebug)
+include(AcInstaller)
+
+# declare our packaging solution
+ac_begin_solution(
+    AcMake
+    VERSION_MAJOR 1 VERSION_MINOR 0 VERSION_PATCH 7
+    DESCRIPTION  "AcMake"
+    VENDOR       "ART+COM AG"
+    CONTACT      "info@artcom.de"
+    DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/DESCRIPTION.txt"
+    LICENSE_FILE     "${CMAKE_SOURCE_DIR}/LICENSE.txt"
+    PACKAGE_ICON     "${CMAKE_SOURCE_DIR}/installer/windows/NSIS-Header.bmp"
+    INSTALLER_ICON   "${CMAKE_SOURCE_DIR}/installer/windows/shopping_bag.ico"
+    UNINSTALLER_ICON "${CMAKE_SOURCE_DIR}/installer/windows/shopping_bag_grey.ico"
+)
+
+ac_end_solution(AcMake)
 # install config file
 install(
     FILES ${CMAKE_BINARY_DIR}/${ACMAKE_MODULES_SUB}/AcMakeConfig.cmake
