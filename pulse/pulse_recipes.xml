@@ -58,6 +58,21 @@
             </executable>
     </macro>
 
+    <macro name="run_cpack_windows">
+        <executable exe="${cpack.bin}" args="${cpack.agent.args} ${cpack.extra.args}" working-dir="${build.dir}" name="package">
+            <artifact ignore-stale="true" name="installer" file="${build.dir}/AcMake-*.*.*-win32.exe"/>
+            <artifact ignore-stale="true" name="binary-zip" file="${build.dir}/AcMake-*.*.*-win32.zip"/>
+        </executable>
+    </macro>
+
+    <macro name="run_cpack_linux">
+        <executable exe="${cpack.bin}" args="${cpack.agent.args} ${cpack.extra.args}" working-dir="${build.dir}" name="package">
+            <artifact ignore-stale="true" name="package-rpm" file="${build.dir}/AcMake-*.*.*-Linux.rpm"/>
+            <artifact ignore-stale="true" name="package-deb" file="${build.dir}/AcMake-*.*.*-Linux.deb"/>
+            <artifact ignore-stale="true" name="binary-tbz2" file="${build.dir}/AcMake-*.*.*-Linux.tar.bz2"/>
+            <artifact ignore-stale="true" name="binary-tgz" file="${build.dir}/AcMake-*.*.*-Linux.tar.gz"/>
+        </executable>
+    </macro>
     <!-- single configuration CMake generators (make,nmake,etc) -->
     <scope>
         <property name="build.dir" value="${build.root}/${build.type}"/>
@@ -80,6 +95,7 @@
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
             <macro-ref macro="${run_gmake_install}"/>
+            <macro-ref macro="${run_cpack_linux}"/>
         </recipe>
 
         <recipe name="GMake OSX Continuous">
@@ -101,9 +117,7 @@
         </recipe>
 
         <recipe name="NMake Continuous">
-            
             <property name="cmake.generator" value="NMake Makefiles"/>
-
             <property name="cmake.recipe.args" value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
             <macro-ref macro="${run_cmake}"/>
@@ -112,14 +126,13 @@
         </recipe>
 
         <recipe name="NMake Nightly">
-            
             <property name="cmake.generator" value="NMake Makefiles"/>
-
             <property name="cmake.recipe.args" value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
             <macro-ref macro="${run_nmake_install}"/>
+            <macro-ref macro="${run_cpack_windows}"/>
         </recipe>
     </scope>
 
