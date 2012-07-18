@@ -183,9 +183,9 @@ macro(_ac_declare_installer NAME)
             set(CPACK_GENERATOR NSIS ZIP) 
         endif(WIN32)
 
-        if(LINUX)
+        if(UNIX AND NOT APPLE)
             set(CPACK_GENERATOR DEB RPM TGZ TBZ2)
-        endif(LINUX)
+        endif(UNIX AND NOT APPLE)
 
         if(WIN32)
             if(INSTALLER_CREATE_SHORTCUTS)
