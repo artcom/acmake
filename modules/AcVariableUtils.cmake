@@ -64,6 +64,14 @@ macro(prepend_global NAME)
     set_global(${NAME} ${_V})
 endmacro(prepend_global NAME)
 
+# Shortcut for uniquely prepending to a list in a global property
+macro(prepend_global_unique NAME)
+    get_global(${NAME} _V)
+    list(INSERT _V 0 ${ARGN})
+    list(REMOVE_DUPLICATES _V)
+    set_global(${NAME} ${_V})
+endmacro(prepend_global_unique NAME)
+
 # Shortcut for retrieving a global property
 macro(get_global NAME INTO)
     set(${INTO})
