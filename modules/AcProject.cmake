@@ -270,7 +270,8 @@ macro(ac_add_project PROJECT_NAME)
 endmacro(ac_add_project PROJECT_NAME)
 
 macro(ac_project_add_build_include_dir PATH)
-    append_global(${ACMAKE_CURRENT_PROJECT}_BUILD_INCLUDE_DIRS ${PATH})
+    STRING(REPLACE "\"" "" P "${PATH}")
+    append_global_unique(${ACMAKE_CURRENT_PROJECT}_BUILD_INCLUDE_DIRS "\"${P}\"")
 endmacro(ac_project_add_build_include_dir)
 
 # Internal method for adding targets to the current project.
