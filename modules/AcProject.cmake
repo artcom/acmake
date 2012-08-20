@@ -423,6 +423,15 @@ endmacro(ac_emit_property)
 # This is where find-files are generated.
 #
 macro(ac_end_project PROJECT_NAME)
+    parse_arguments(THIS_PROJECT
+        "INSTALL_COMPONENT"
+        "DONT_INSTALL"
+        ${ARGN}
+    )
+    if(NOT THIS_PROJECT_INSTALL_COMPONENT)
+        set(THIS_PROJECT_INSTALL_COMPONENT ${PROJECT_NAME}_development)
+    endif(NOT THIS_PROJECT_INSTALL_COMPONENT)
+    
     # Check if we are ending the right project
     if(NOT "${PROJECT_NAME}" STREQUAL "${ACMAKE_CURRENT_PROJECT}")
         message(FATAL_ERROR "Ending a project that is not the current project.")
@@ -517,17 +526,19 @@ macro(ac_end_project PROJECT_NAME)
     endforeach(LIBRARY ${THIS_PROJECT_LIBRARIES})
 
     # Install cmake files
-    install(
-        FILES
-            "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Config.cmake"
-            "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Dependencies.cmake"
-            "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Targets.cmake"
-            ${THIS_PROJECT_CUSTOM_SCRIPTS}
-            ${THIS_PROJECT_CUSTOM_TEMPLATES}
-	    DESTINATION ${THIS_PROJECT_CMAKE_SUBDIR}
-        COMPONENT ${PROJECT_NAME}_development
-    )
-
+    if(NOT THIS_PROJECT_DONT_INSTALL)
+        install(
+            FILES
+                "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Config.cmake"
+                "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Dependencies.cmake"
+                "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Targets.cmake"
+                ${THIS_PROJECT_CUSTOM_SCRIPTS}
+                ${THIS_PROJECT_CUSTOM_TEMPLATES}
+            DESTINATION ${THIS_PROJECT_CMAKE_SUBDIR}
+            COMPONENT ${THIS_PROJECT_INSTALL_COMPONENT}
+        )
+    endif(NOT THIS_PROJECT_DONT_INSTALL)
+    
     # Remove our local copy of the project
     clear_locals(THIS_PROJECT ${_AC_PROJECT_VARIABLES})
 
