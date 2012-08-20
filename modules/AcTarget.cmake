@@ -38,7 +38,12 @@ endfunction(_ac_prepend_target_flag TARGET PROPERTY VALUE)
 # PROPAGATE indicates if this path should be used by dependents
 function(_ac_add_include_path TARGET PATH PROPAGATE)
     ac_debug_searchpaths("${TARGET} gets include path ${PATH}")
-    include_directories("${PATH}")
+    # XXX: at this point we get include paths with quotation marks and without,
+    #      we need them with so cmake handles paths with white spaces as one include path.
+    #      But if we quote the quotated string cmake fails to include the correct paths,
+    #      so we replace them if any and add the quotation marks again to correctly include the paths
+    STRING(REPLACE "\"" "" P "${PATH}")
+    include_directories("${P}")
     if(PROPAGATE)
         prepend_global_unique(${TARGET}_INCLUDE_DIRS "${PATH}")
         ac_project_add_build_include_dir("${PATH}")
