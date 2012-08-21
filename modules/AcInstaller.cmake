@@ -28,6 +28,11 @@ ac_define_debug_channel(installer "Installer framework debugging")
 # Option for disabling the whole installer subsystem.
 option(ACMAKE_BUILD_PACKAGES "Allow building packages with CPack" YES)
 
+# load cpack helper
+if(ACMAKE_BUILD_PACKAGES)
+    include(CPack)
+endif(ACMAKE_BUILD_PACKAGES)
+
 # Declare a solution, initializing AcInstaller to run in solution mode.
 # Note that there can only be one solution per build environment.
 #
@@ -222,9 +227,6 @@ macro(_ac_declare_installer NAME)
         endif(WIN32)
 
         ac_debug_installer("CPack is being initialized")
-
-        # load cpack helper
-        include(CPack)
 
     endif(ACMAKE_BUILD_PACKAGES)
 endmacro(_ac_declare_installer)
