@@ -50,7 +50,7 @@
 macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     # put arguments into the THIS_PLUGIN namespace
     parse_arguments(THIS_PLUGIN
-        "SOURCES;HEADERS;DEPENDS;EXTERNS;DEVELOPMENT_DEBIAN_PACKAGE;DEVELOPMENT_INSTALL_COMPONENT;RUNTIME_INSTALL_COMPONENT;RUNTIME_DEBIAN_PACKAGE"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;SOVERSION;VERSION;DEVELOPMENT_DEBIAN_PACKAGE;DEVELOPMENT_INSTALL_COMPONENT;RUNTIME_INSTALL_COMPONENT;RUNTIME_DEBIAN_PACKAGE"
         "DONT_INSTALL"
         ${ARGN})
     
@@ -165,6 +165,54 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
         endif(ACMAKE_DEBIAN_PACKAGES)
     endif(NOT THIS_PLUGIN_DONT_INSTALL)
 
+    # create tests
+    # TODO: clean up test naming
+    # XXX: This is goddamn ugly.
+    #      Maybe, we should replace it with a separate subsystem.
+    if(ACMAKE_BUILD_TESTS)
+        set(TEST_NAMESPACE "${THIS_PLUGIN_NAME}")
+        foreach(TEST ${THIS_PLUGIN_TESTS})
+            set(TEST_NAME "${TEST_NAMESPACE}_test${TEST}")
+
+            # header only libraries do not require the lib which only
+            # exists as a workaround
+            if(THIS_PLUGIN_HEADER_ONLY)
+                set(THIS_PLUGIN_MAYBE_LINK_SELF)
+            else(THIS_PLUGIN_HEADER_ONLY)
+                set(THIS_PLUGIN_MAYBE_LINK_SELF ${THIS_PLUGIN_NAME})
+            endif(THIS_PLUGIN_HEADER_ONLY)
+            # define the executable
+            ac_add_executable(
+                ${TEST_NAME}
+                SOURCES test${TEST}.tst.cpp
+                DEPENDS ${THIS_PLUGIN_DEPENDS} ${THIS_PLUGIN_MAYBE_LINK_SELF} # XXX: asl-specifics
+                EXTERNS ${THIS_PLUGIN_EXTERNS}
+                DONT_INSTALL
+                NO_REVISION_INFO
+            )
+
+            # add path to generated headers from our parent library
+            # XXX: maybe remove when executable has own conf header?
+            _ac_add_include_path(${TEST_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR} NO)
+
+            # XXX: We know how to do better here! We should use
+            #      CMAKE_CFG_INTDIR and run ctest through vcbuild:
+            #
+            #      $ vcbuild RUN_TESTS.vcproj "Win32|<build_config>"
+            #
+            #      If this is neccessary at all. I still think the above
+            #      command line does exactly the right thing without our
+            #      interference.
+            #      I'm on Mac OS right now so I can't test it and I don't want
+            #      to break the build. Buddah is smiling so nicely. [DS]
+            get_target_property(
+                TEST_LOCATION ${TEST_NAME} LOCATION_${CMAKE_BUILD_TYPE}
+            )
+
+            # tell ctest about it
+            add_test(${THIS_PLUGIN_NAME}_${TEST} ${TEST_LOCATION})
+        endforeach(TEST)
+    endif(ACMAKE_BUILD_TESTS)
     # register plugin with project
     if(NOT THIS_PLUGIN_DONT_INSTALL)
         ac_project_add_target(
