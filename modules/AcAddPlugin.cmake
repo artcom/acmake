@@ -4,9 +4,9 @@
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
-# It is distributed under the Boost Software License, Version 1.0. 
+# It is distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
-#  http://www.boost.org/LICENSE_1_0.txt)             
+#  http://www.boost.org/LICENSE_1_0.txt)
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 #
@@ -53,7 +53,7 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
         "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;SOVERSION;VERSION;DEVELOPMENT_DEBIAN_PACKAGE;DEVELOPMENT_INSTALL_COMPONENT;RUNTIME_INSTALL_COMPONENT;RUNTIME_DEBIAN_PACKAGE"
         "DONT_INSTALL"
         ${ARGN})
-    
+
     # do the same manually for name and path
     set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
     set(THIS_PLUGIN_PATH "${PLUGIN_PATH}")
@@ -97,15 +97,24 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     # attach headers to target
     set_target_properties(
         ${THIS_PLUGIN_NAME} PROPERTIES
-            PUBLIC_HEADER "${THIS_PLUGIN_HEADERS}"
+        PUBLIC_HEADER "${THIS_PLUGIN_HEADERS}"
     )
-    
+
     # attach rpath configuration
     _ac_attach_rpath(${THIS_PLUGIN_NAME})
 
     # attach depends and externs
     _ac_attach_depends(${THIS_PLUGIN_NAME} "${THIS_PLUGIN_DEPENDS}" "${THIS_PLUGIN_EXTERNS}")
-    
+    # apply version properties
+
+    if (THIS_PLUGIN_SOVERSION AND THIS_PLUGIN_VERSION)
+        set_target_properties(
+            ${THIS_PLUGIN_NAME} PROPERTIES
+            VERSION ${THIS_PLUGIN_VERSION}
+            SOVERSION ${THIS_PLUGIN_SOVERSION}
+        )
+    endif(THIS_PLUGIN_SOVERSION AND THIS_PLUGIN_VERSION)
+
     # define installation
     if(NOT THIS_PLUGIN_DONT_INSTALL)
         # figure out components to install into
