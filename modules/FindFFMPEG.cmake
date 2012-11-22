@@ -15,7 +15,7 @@ if(WIN32)
 else(WIN32)
     foreach(SUBLIB ${FFMPEG_SUBLIBS})
         string(TOUPPER ${SUBLIB} SUBLIB_UPPER)
-        pkg_search_module(${SUBLIB_UPPER} REQUIRED ${SUBLIB})
+        pkg_search_module(${SUBLIB_UPPER} REQUIRED lib${SUBLIB})
         set (${SUBLIB_UPPER}_INCLUDE_DIRS ${${SUBLIB_UPPER}_INCLUDEDIR})
         find_library( ${SUBLIB_UPPER}_LIBRARIES NAMES ${SUBLIB} lib${SUBLIB} HINTS ${${SUBLIB_UPPER}_LIBDIR})
         mark_as_advanced(
