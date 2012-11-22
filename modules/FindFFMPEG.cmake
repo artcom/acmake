@@ -1,6 +1,6 @@
+set(FFMPEG_SUBLIBS avcodec avformat avutil swscale)
+
 if(WIN32)
-    set(FFMPEG_SUBLIBS avcodec avformat avutil swscale)
-    
     foreach(SUBLIB ${FFMPEG_SUBLIBS})
         string(TOUPPER ${SUBLIB} SUBLIB_UPPER)
         find_path( ${SUBLIB_UPPER}_INCLUDE_DIRS lib${SUBLIB}/${SUBLIB}.h )
@@ -13,42 +13,20 @@ if(WIN32)
 
     set(FFMPEG_ALL_FOUND YES)
 else(WIN32)
-    # XXX: required handling is broken here
-
-    pkg_search_module(AVCODEC REQUIRED  libavcodec)
-    pkg_search_module(AVFORMAT REQUIRED libavformat)
-    pkg_search_module(SWSCALE           libswscale)
-
-    # contains av_free etc and is needed on Mac OS X. I think this is because of
-    # incorrect linkage in the ffmpeg build. avformat etc should link avutil instead
-    # of leaving the symbols undefined until the libs are linked (I think they use 
-    # -undefined dynamic_lookup or something).
-    # [DS]
-    pkg_search_module(AVUTIL REQUIRED libavutil) 
-
-    pkg_search_module(AVFILTER libavfilter) # optional because it does not exist on linux
+    foreach(SUBLIB ${FFMPEG_SUBLIBS})
+        string(TOUPPER ${SUBLIB} SUBLIB_UPPER)
+        pkg_search_module(${SUBLIB_UPPER} REQUIRED ${SUBLIB})
+        set (${SUBLIB_UPPER}_INCLUDE_DIRS ${${SUBLIB_UPPER}_INCLUDEDIR})
+        find_library( ${SUBLIB_UPPER}_LIBRARIES NAMES ${SUBLIB} lib${SUBLIB} HINTS ${${SUBLIB_UPPER}_LIBDIR})
+        mark_as_advanced(
+            ${SUBLIB_UPPER}_LIBRARIES
+            ${SUBLIB_UPPER}_INCLUDE_DIRS
+        )
+    endforeach(SUBLIB ${FFMPEG_SUBLIBS})
 
     if(AVCODEC_FOUND AND AVFORMAT_FOUND AND AVUTIL_FOUND)
         set(FFMPEG_ALL_FOUND YES)
     endif(AVCODEC_FOUND AND AVFORMAT_FOUND AND AVUTIL_FOUND)
-    
-    macro(ffmpeg_fixup_include_paths EXPORT_NAME LIBRARY_NAME)
-        if(${EXPORT_NAME}_FOUND)
-            if(LINUX)
-                if(NOT ${EXPORT_NAME}_INCLUDE_DIRS)
-                    message(STATUS "Warning: Fixing up include paths for ${LIBRARY_NAME} with hardcoded defaults")
-                    set(${EXPORT_NAME}_INCLUDE_DIRS "/usr/include/${LIBRARY_NAME}")
-                endif(NOT ${EXPORT_NAME}_INCLUDE_DIRS)
-            endif(LINUX)
-        endif(${EXPORT_NAME}_FOUND)
-    endmacro(ffmpeg_fixup_include_paths)
-    
-    ffmpeg_fixup_include_paths(AVCODEC  libavcodec)
-    ffmpeg_fixup_include_paths(AVFORMAT libavformat)
-    ffmpeg_fixup_include_paths(SWSCALE  libswscale)
-    ffmpeg_fixup_include_paths(AVUTIL   libavutil)
-    ffmpeg_fixup_include_paths(AVFILTER libavfilter)
-    
 endif(WIN32)
 
 set(FFMPEG_LIBRARIES ${AVCODEC_LIBRARIES} ${AVFORMAT_LIBRARIES} ${AVFILTER_LIBRARIES} ${SWSCALE_LIBRARIES} ${AVUTIL_LIBRARIES})
