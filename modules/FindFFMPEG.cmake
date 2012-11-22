@@ -3,7 +3,7 @@ if(WIN32)
     
     foreach(SUBLIB ${FFMPEG_SUBLIBS})
         string(TOUPPER ${SUBLIB} SUBLIB_UPPER)
-        find_path( ${SUBLIB_UPPER}_INCLUDE_DIRS ${SUBLIB}.h PATH_SUFFIXES lib${SUBLIB} ffmpeg)
+        find_path( ${SUBLIB_UPPER}_INCLUDE_DIRS lib${SUBLIB}/${SUBLIB}.h )
         find_library( ${SUBLIB_UPPER}_LIBRARIES NAMES ${SUBLIB} lib${SUBLIB})
         mark_as_advanced(
             ${SUBLIB_UPPER}_LIBRARIES
