@@ -6,13 +6,13 @@
 #  CRYPTOPP_FOUND        - True if crypto++ found.
 
 # Look for the header file.
-FIND_PATH(CRYPTOPP_INCLUDE_DIR NAMES crypto++/
+FIND_PATH(CRYPTOPP_INCLUDE_DIR NAMES crypto++/ cryptopp/
         PATH_SUFFIXES include )
 MARK_AS_ADVANCED(CRYPTOPP_INCLUDE_DIR)
 
 # Look for the library.
-FIND_LIBRARY(CRYPTOPP_LIBRARY NAMES crypto++ libcrypto++)
-FIND_LIBRARY(CRYPTOPP_LIBRARY_D NAMES crypto++ libcrypto++)
+FIND_LIBRARY(CRYPTOPP_LIBRARY NAMES crypto++ libcrypto++ libcryptopp.a libcryptopp)
+FIND_LIBRARY(CRYPTOPP_LIBRARY_D NAMES crypto++ libcrypto++ libcryptopp.a libcryptopp)
 MARK_AS_ADVANCED(CRYPTOPP_LIBRARY CRYPTOPP_LIBRARY_D)
 
 # handle the QUIETLY and REQUIRED arguments and set CRYPTOPP_FOUND to TRUE if 
