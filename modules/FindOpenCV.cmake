@@ -25,8 +25,12 @@ else(OSX)
 else(WIN32)
     set(OPENCV_SUBLIBS cv cvaux cxcore highgui ml)
 endif(WIN32)
-
 mark_as_advanced(OPENCV_SUBLIBS)
+
+if(OSX) 
+    set(OPENCV_BLOB_SUBLIBS cvblob)
+endif(OSX)
+mark_as_advanced(OPENCV_BLOB_SUBLIBS)
 
 set(OPENCV_LIBRARIES)
 foreach(SUBLIB ${OPENCV_SUBLIBS})
@@ -34,7 +38,14 @@ foreach(SUBLIB ${OPENCV_SUBLIBS})
     find_library(OPENCV_SUBLIB_${SUBLIB} NAMES ${SUBLIB}  PATH_SUFFIXES lib PATHS "C:/OpenCV2.1" /usr/local/lib )
     list(APPEND OPENCV_LIBRARIES ${OPENCV_SUBLIB_${SUBLIB}})        
 endforeach(SUBLIB ${OPENCV_ALL_SUBLIBS})
-    
+
+if(OPENCV_BLOB_SUBLIBS) 
+foreach(SUBLIB ${OPENCV_BLOB_SUBLIBS})
+    mark_as_advanced(OPENCV_SUBLIB_${SUBLIB})
+    find_library(OPENCV_SUBLIB_${SUBLIB} NAMES ${SUBLIB}  PATH_SUFFIXES lib PATHS "C:/OpenCV2.1" /usr/local/lib )
+    list(APPEND OPENCV_LIBRARIES ${OPENCV_SUBLIB_${SUBLIB}})        
+endforeach(SUBLIB ${OPENCV_ALL_SUBLIBS})
+endif(OPENCV_BLOB_SUBLIBS)    
 
 if(WIN32)
     set(OPENCV_SUBLIBS_D cv210d.lib cvaux210d.lib cxcore210d.lib cxts210d.lib highgui210d.lib ml210d.lib)
