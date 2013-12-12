@@ -143,20 +143,24 @@ function(_ac_collect_extern_libraries OUT)
         else(${EXTERN}_IS_PROJECT)
             # normal libraries have two cases
 
-            if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
+            if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_RELEASE OR ${EXTERN}_LIBRARY_DEBUG OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
                 # case 1: split debug, optimized and common given by package
 
                 if(${EXTERN}_LIBRARIES_D)
                     list(APPEND DEBUG ${${EXTERN}_LIBRARIES_D})
-                else(${EXTERN}_LIBRARIES_D)
+                elseif(${EXTERN}_LIBRARY_D)
                     list(APPEND DEBUG ${${EXTERN}_LIBRARY_D})
+                elseif(${EXTERN}_LIBRARY_DEBUG)
+                    list(APPEND DEBUG ${${EXTERN}_LIBRARY_DEBUG})
                 endif(${EXTERN}_LIBRARIES_D)
 
-                if(${EXTERN}_LIBRARIES)
+                if(${EXTERN}_LIBRARY_RELEASE)
+                    list(APPEND OPTIMIZED ${${EXTERN}_LIBRARY_RELEASE})
+                elseif(${EXTERN}_LIBRARIES)
                     list(APPEND OPTIMIZED ${${EXTERN}_LIBRARIES})
-                else(${EXTERN}_LIBRARIES)
+                elseif(${EXTERN}_LIBRARY)
                     list(APPEND OPTIMIZED ${${EXTERN}_LIBRARY})
-                endif(${EXTERN}_LIBRARIES)
+                endif(${EXTERN}_LIBRARY_RELEASE)
 
                 if(${EXTERN}_LIBRARIES_C)
                     list(APPEND COMMON ${${EXTERN}_LIBRARIES_C})
@@ -164,7 +168,7 @@ function(_ac_collect_extern_libraries OUT)
                     list(APPEND COMMON ${${EXTERN}_LIBRARY_C})
                 endif(${EXTERN}_LIBRARIES_C)
 
-            else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
+            else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_RELEASE OR ${EXTERN}_LIBRARY_DEBUG OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
                 # case 2: only one variant that will go into the common set
 
                 if(${EXTERN}_LIBRARIES)
@@ -173,7 +177,7 @@ function(_ac_collect_extern_libraries OUT)
                     list(APPEND COMMON ${${EXTERN}_LIBRARY})
                 endif(${EXTERN}_LIBRARIES)
 
-            endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
+            endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_RELEASE OR ${EXTERN}_LIBRARY_DEBUG OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
         endif(${EXTERN}_IS_PROJECT)
     endforeach(EXTERN)
 
@@ -267,20 +271,26 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
     # externs too
     _ac_collect_extern_libraries(EXTERN_LIBRARIES ${EXTERNS})
 
-    # XXX Hack to filter "optimzed" and "debug" keywords left by FindBoost
-    #     Probably something Ingo wants to take a look at. [DS]
-    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_COMMON}")
-    set(EXTERN_LIBRARIES_COMMON ${tmp})
-    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_COMMON}")
-    set(EXTERN_LIBRARIES_COMMON ${tmp})
-    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_DEBUG}")
-    set(EXTERN_LIBRARIES_DEBUG ${tmp})
-    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_DEBUG}")
-    set(EXTERN_LIBRARIES_DEBUG ${tmp})
-    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_OPTIMIZED}")
-    set(EXTERN_LIBRARIES_OPTIMIZED ${tmp})
-    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_OPTIMIZED}")
-    set(EXTERN_LIBRARIES_OPTIMIZED ${tmp})
+    # filter out Boosts debug and optimized libraries from common
+    set(DEBUG_LIB FALSE)
+    set(OPTIMIZED_LIB FALSE)
+    foreach(LIB ${EXTERN_LIBRARIES_COMMON})
+        if(LIB MATCHES "optimized")
+            set(OPTIMIZED_LIB TRUE)
+            set(DEBUG_LIB FALSE)
+            list(REMOVE_ITEM EXTERN_LIBRARIES_COMMON "${LIB}")
+        elseif(LIB MATCHES "debug")
+            set(DEBUG_LIB TRUE)
+            set(OPTIMIZED_LIB FALSE)
+            list(REMOVE_ITEM EXTERN_LIBRARIES_COMMON "${LIB}")
+        elseif(DEBUG_LIB)
+            list(APPEND EXTERN_LIBRARIES_DEBUG "${LIB}")
+            list(REMOVE_ITEM EXTERN_LIBRARIES_COMMON "${LIB}")
+        elseif(OPTIMIZED_LIB)
+            list(APPEND EXTERN_LIBRARIES_OPTIMIZED "${LIB}")
+            list(REMOVE_ITEM EXTERN_LIBRARIES_COMMON "${LIB}")
+        endif(LIB MATCHES "optimized")
+    endforeach(LIB)
 
 
     # set of all libraries
