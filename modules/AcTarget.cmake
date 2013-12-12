@@ -4,9 +4,9 @@
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
-# It is distributed under the Boost Software License, Version 1.0. 
+# It is distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
-#  http://www.boost.org/LICENSE_1_0.txt)             
+#  http://www.boost.org/LICENSE_1_0.txt)
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 #
@@ -79,7 +79,7 @@ function(_ac_collect_depend_libraries OUT)
     set(LIBRARIES)
     foreach(DEPEND ${ARGN})
         get_target_property(DEPEND_TYPE ${DEPEND} TYPE)
-        
+
         if(DEPEND_TYPE STREQUAL "SHARED_LIBRARY"
                 OR DEPEND_TYPE STREQUAL "STATIC_LIBRARY")
             list(APPEND LIBRARIES ${DEPEND})
@@ -118,7 +118,7 @@ function(_ac_collect_extern_definitions OUT)
     foreach(EXTERN ${ARGN})
         if (${EXTERN}_DEFINITIONS)
             list(APPEND DEFINITIONS ${${EXTERN}_DEFINITIONS})
-        endif (${EXTERN}_DEFINITIONS)        
+        endif (${EXTERN}_DEFINITIONS)
     endforeach(EXTERN)
     set(${OUT} "${DEFINITIONS}" PARENT_SCOPE)
 endfunction(_ac_collect_extern_definitions)
@@ -356,7 +356,7 @@ endmacro(_ac_attach_depends)
 # EXTERNS and DEPENDS to the given TARGET
 macro(_ac_add_dependency_paths TARGET DEPENDS EXTERNS)
     _ac_collect_dependency_paths(${TARGET} LIBRARY_DIRS INCLUDE_DIRS "${DEPENDS}" "${EXTERNS}")
-    
+
     foreach(DIR ${LIBRARY_DIRS})
         _ac_add_library_path(${TARGET} "${DIR}" YES)
     endforeach(DIR)
@@ -465,14 +465,14 @@ endmacro(_ac_create_source_symlinks)
 
 # add properties to an existent set of properties
 macro(ac_add_target_properties _target _name)
-	set(_properties)
-	foreach(_prop ${ARGN})
-		set(_properties "${_properties} ${_prop}")
-	endforeach(_prop)
-	get_target_property(_old_properties ${_target} ${_name})
-	if(NOT _old_properties)
-		# in case it's NOTFOUND
-		set(_old_properties)
-	endif(NOT _old_properties)
-	set_target_properties(${_target} PROPERTIES ${_name} "${_old_properties} ${_properties}")
+    set(_properties)
+    foreach(_prop ${ARGN})
+        set(_properties "${_properties} ${_prop}")
+    endforeach(_prop)
+    get_target_property(_old_properties ${_target} ${_name})
+    if(NOT _old_properties)
+        # in case it's NOTFOUND
+        set(_old_properties)
+    endif(NOT _old_properties)
+    set_target_properties(${_target} PROPERTIES ${_name} "${_old_properties} ${_properties}")
 endmacro(ac_add_target_properties)
