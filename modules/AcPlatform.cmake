@@ -41,11 +41,11 @@ if(UNIX)
         # XXX CMake uses .so suffix on Mac OS X. We want .dylib
         set( CMAKE_SHARED_MODULE_SUFFIX ".dylib" )
 
-        if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
-            add_definitions( -DOSX_X86 )
-        else( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
-            add_definitions( -DOSX_PPC )
-        endif( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
+        #if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
+        add_definitions( -DOSX_X86 )
+        #else( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
+        #add_definitions( -DOSX_PPC )
+        # endif( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
         
     else(APPLE)
         
