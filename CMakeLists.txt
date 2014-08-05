@@ -36,7 +36,7 @@ include(AcInstaller)
 # declare our packaging solution
 ac_begin_solution(
     AcMake
-    VERSION_MAJOR 1 VERSION_MINOR 0 VERSION_PATCH 8
+    VERSION_MAJOR 1 VERSION_MINOR 0 VERSION_PATCH 9
     DESCRIPTION  "AcMake"
     VENDOR       "ART+COM AG"
     CONTACT      "info@artcom.de"

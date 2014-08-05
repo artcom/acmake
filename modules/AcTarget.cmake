@@ -4,9 +4,9 @@
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
-# It is distributed under the Boost Software License, Version 1.0. 
+# It is distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
-#  http://www.boost.org/LICENSE_1_0.txt)             
+#  http://www.boost.org/LICENSE_1_0.txt)
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 #
@@ -79,7 +79,7 @@ function(_ac_collect_depend_libraries OUT)
     set(LIBRARIES)
     foreach(DEPEND ${ARGN})
         get_target_property(DEPEND_TYPE ${DEPEND} TYPE)
-        
+
         if(DEPEND_TYPE STREQUAL "SHARED_LIBRARY"
                 OR DEPEND_TYPE STREQUAL "STATIC_LIBRARY")
             list(APPEND LIBRARIES ${DEPEND})
@@ -118,7 +118,7 @@ function(_ac_collect_extern_definitions OUT)
     foreach(EXTERN ${ARGN})
         if (${EXTERN}_DEFINITIONS)
             list(APPEND DEFINITIONS ${${EXTERN}_DEFINITIONS})
-        endif (${EXTERN}_DEFINITIONS)        
+        endif (${EXTERN}_DEFINITIONS)
     endforeach(EXTERN)
     set(${OUT} "${DEFINITIONS}" PARENT_SCOPE)
 endfunction(_ac_collect_extern_definitions)
@@ -143,20 +143,24 @@ function(_ac_collect_extern_libraries OUT)
         else(${EXTERN}_IS_PROJECT)
             # normal libraries have two cases
 
-            if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
+            if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_RELEASE OR ${EXTERN}_LIBRARY_DEBUG OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
                 # case 1: split debug, optimized and common given by package
 
                 if(${EXTERN}_LIBRARIES_D)
                     list(APPEND DEBUG ${${EXTERN}_LIBRARIES_D})
-                else(${EXTERN}_LIBRARIES_D)
+                elseif(${EXTERN}_LIBRARY_D)
                     list(APPEND DEBUG ${${EXTERN}_LIBRARY_D})
+                elseif(${EXTERN}_LIBRARY_DEBUG)
+                    list(APPEND DEBUG ${${EXTERN}_LIBRARY_DEBUG})
                 endif(${EXTERN}_LIBRARIES_D)
 
-                if(${EXTERN}_LIBRARIES)
+                if(${EXTERN}_LIBRARY_RELEASE)
+                    list(APPEND OPTIMIZED ${${EXTERN}_LIBRARY_RELEASE})
+                elseif(${EXTERN}_LIBRARIES)
                     list(APPEND OPTIMIZED ${${EXTERN}_LIBRARIES})
-                else(${EXTERN}_LIBRARIES)
+                elseif(${EXTERN}_LIBRARY)
                     list(APPEND OPTIMIZED ${${EXTERN}_LIBRARY})
-                endif(${EXTERN}_LIBRARIES)
+                endif(${EXTERN}_LIBRARY_RELEASE)
 
                 if(${EXTERN}_LIBRARIES_C)
                     list(APPEND COMMON ${${EXTERN}_LIBRARIES_C})
@@ -164,7 +168,7 @@ function(_ac_collect_extern_libraries OUT)
                     list(APPEND COMMON ${${EXTERN}_LIBRARY_C})
                 endif(${EXTERN}_LIBRARIES_C)
 
-            else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
+            else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_RELEASE OR ${EXTERN}_LIBRARY_DEBUG OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
                 # case 2: only one variant that will go into the common set
 
                 if(${EXTERN}_LIBRARIES)
@@ -173,7 +177,7 @@ function(_ac_collect_extern_libraries OUT)
                     list(APPEND COMMON ${${EXTERN}_LIBRARY})
                 endif(${EXTERN}_LIBRARIES)
 
-            endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
+            endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_RELEASE OR ${EXTERN}_LIBRARY_DEBUG OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
         endif(${EXTERN}_IS_PROJECT)
     endforeach(EXTERN)
 
@@ -267,20 +271,31 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
     # externs too
     _ac_collect_extern_libraries(EXTERN_LIBRARIES ${EXTERNS})
 
-    # XXX Hack to filter "optimzed" and "debug" keywords left by FindBoost
-    #     Probably something Ingo wants to take a look at. [DS]
-    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_COMMON}")
-    set(EXTERN_LIBRARIES_COMMON ${tmp})
-    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_COMMON}")
-    set(EXTERN_LIBRARIES_COMMON ${tmp})
-    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_DEBUG}")
-    set(EXTERN_LIBRARIES_DEBUG ${tmp})
-    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_DEBUG}")
-    set(EXTERN_LIBRARIES_DEBUG ${tmp})
-    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_OPTIMIZED}")
-    set(EXTERN_LIBRARIES_OPTIMIZED ${tmp})
-    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_OPTIMIZED}")
-    set(EXTERN_LIBRARIES_OPTIMIZED ${tmp})
+    # filter out Boosts debug and optimized libraries from common
+    set(DEBUG_LIB FALSE)
+    set(OPTIMIZED_LIB FALSE)
+    foreach(LIB ${EXTERN_LIBRARIES_COMMON})
+        if(LIB MATCHES "optimized")
+            set(OPTIMIZED_LIB TRUE)
+            set(DEBUG_LIB FALSE)
+            list(REMOVE_ITEM EXTERN_LIBRARIES_COMMON "${LIB}")
+        elseif(LIB MATCHES "debug")
+            set(DEBUG_LIB TRUE)
+            set(OPTIMIZED_LIB FALSE)
+            list(REMOVE_ITEM EXTERN_LIBRARIES_COMMON "${LIB}")
+        elseif(DEBUG_LIB)
+            list(APPEND EXTERN_LIBRARIES_DEBUG "${LIB}")
+            list(REMOVE_ITEM EXTERN_LIBRARIES_COMMON "${LIB}")
+            set(DEBUG_LIB FALSE)
+        elseif(OPTIMIZED_LIB)
+            list(APPEND EXTERN_LIBRARIES_OPTIMIZED "${LIB}")
+            list(REMOVE_ITEM EXTERN_LIBRARIES_COMMON "${LIB}")
+            set(OPTIMIZED_LIB FALSE)
+        else(LIB MATCHES "optimized")
+            set(OPTIMIZED_LIB FALSE)
+            set(DEBUG_LIB FALSE)
+        endif(LIB MATCHES "optimized")
+    endforeach(LIB)
 
 
     # set of all libraries
@@ -356,7 +371,7 @@ endmacro(_ac_attach_depends)
 # EXTERNS and DEPENDS to the given TARGET
 macro(_ac_add_dependency_paths TARGET DEPENDS EXTERNS)
     _ac_collect_dependency_paths(${TARGET} LIBRARY_DIRS INCLUDE_DIRS "${DEPENDS}" "${EXTERNS}")
-    
+
     foreach(DIR ${LIBRARY_DIRS})
         _ac_add_library_path(${TARGET} "${DIR}" YES)
     endforeach(DIR)
@@ -465,14 +480,14 @@ endmacro(_ac_create_source_symlinks)
 
 # add properties to an existent set of properties
 macro(ac_add_target_properties _target _name)
-	set(_properties)
-	foreach(_prop ${ARGN})
-		set(_properties "${_properties} ${_prop}")
-	endforeach(_prop)
-	get_target_property(_old_properties ${_target} ${_name})
-	if(NOT _old_properties)
-		# in case it's NOTFOUND
-		set(_old_properties)
-	endif(NOT _old_properties)
-	set_target_properties(${_target} PROPERTIES ${_name} "${_old_properties} ${_properties}")
+    set(_properties)
+    foreach(_prop ${ARGN})
+        set(_properties "${_properties} ${_prop}")
+    endforeach(_prop)
+    get_target_property(_old_properties ${_target} ${_name})
+    if(NOT _old_properties)
+        # in case it's NOTFOUND
+        set(_old_properties)
+    endif(NOT _old_properties)
+    set_target_properties(${_target} PROPERTIES ${_name} "${_old_properties} ${_properties}")
 endmacro(ac_add_target_properties)

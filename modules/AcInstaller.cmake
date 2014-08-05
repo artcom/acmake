@@ -179,6 +179,19 @@ macro(_ac_declare_installer NAME)
         set(CPACK_PACKAGE_VERSION_MINOR "${INSTALLER_VERSION_MINOR}")
         set(CPACK_PACKAGE_VERSION_PATCH "${INSTALLER_VERSION_PATCH}")
 
+        set(CPACK_SYSTEM_NAME
+            ${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR})
+        if(${CPACK_SYSTEM_NAME} MATCHES Windows)
+            if(CMAKE_CL_64)
+                set(CPACK_SYSTEM_NAME
+                    win64)
+            else()
+                set(CPACK_SYSTEM_NAME
+                    win32)
+            endif()
+        endif()
+
+
         if(WIN32)
             set(CPACK_GENERATOR NSIS ZIP) 
         endif(WIN32)
